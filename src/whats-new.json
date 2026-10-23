@@ -1,0 +1,25 @@
+{
+	"id": "inline-block-embeds",
+	"name": "Inline Block Embeds",
+	"version": "1.0.0",
+	"changes": [],
+	"tip": "Hold Ctrl or Cmd and click the inline text to open the source block. A plain click shows the embed link so you can edit it.",
+	"thanks": "Hi, I am Michael, a solo developer in Poland. Inline Block Embeds is one of over 100 small plugins that I make. Thank you for trusting it with your notes.",
+	"related": [
+		{
+			"id": "callout-table-footnotes",
+			"name": "Footnotes in Callouts and Tables",
+			"blurb": "Show footnote references in callouts and tables as numbered links."
+		},
+		{
+			"id": "embed-outline",
+			"name": "Embed Outline",
+			"blurb": "See the headings of embedded notes in one outline."
+		},
+		{
+			"id": "heading-link-sync",
+			"name": "Heading Link Sync",
+			"blurb": "Keep links to a heading working when you edit the heading."
+		}
+	]
+}

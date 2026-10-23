@@ -1,0 +1,506 @@
+{
+ "slug": "inline-block-embeds",
+ "module": "inline-block-embeds/src/embeds",
+ "function": "inlineText",
+ "note": "Each case names its function in fn: inlineText(source, blockId, listItems = true) gives {state inline|native|missing, kind, text}; selectEmbeds(line, drawAll = false) gives each block embed of the line with from, to, linktext, path, blockId, alias, display and selected; expandInline(files, path, blockId) gives the plain text that a reader sees, with nested inline embeds expanded, a loop or a level past depth 3 shown as link text, and a heading or note embed that Obsidian draws shown as [text] (it counts as one level and is part of the loop check). Names that start with a number are acceptance cases 1 to 6 of the spec. Reviewed by hand against each input.",
+ "cases": [
+  {
+   "name": "1 sentence with an embed selects it",
+   "fn": "selectEmbeds",
+   "args": [
+    "Text ![[A#^p1]] more."
+   ],
+   "expected": [
+    {
+     "from": 5,
+     "to": 15,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "1 paragraph block gives its text without the marker",
+   "fn": "inlineText",
+   "args": [
+    "Hello **world** ^p1",
+    "p1"
+   ],
+   "expected": {
+    "state": "inline",
+    "kind": "paragraph",
+    "text": "Hello **world**"
+   }
+  },
+  {
+   "name": "2 embed alone on its line is not selected",
+   "fn": "selectEmbeds",
+   "args": [
+    "![[A#^p1]]"
+   ],
+   "expected": [
+    {
+     "from": 0,
+     "to": 10,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": false
+    }
+   ]
+  },
+  {
+   "name": "2 embed alone on its line is selected with draw every embed",
+   "fn": "selectEmbeds",
+   "args": [
+    "![[A#^p1]]",
+    true
+   ],
+   "expected": [
+    {
+     "from": 0,
+     "to": 10,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "3 task list item drops the marker, the box and the id",
+   "fn": "inlineText",
+   "args": [
+    "# Calls\n\n- [ ] Call Bob ^t1\n- [x] Mail Ann\n",
+    "t1"
+   ],
+   "expected": {
+    "state": "inline",
+    "kind": "listItem",
+    "text": "Call Bob"
+   }
+  },
+  {
+   "name": "4 missing block is missing",
+   "fn": "inlineText",
+   "args": [
+    "Hello **world** ^p1",
+    "missing"
+   ],
+   "expected": {
+    "state": "missing",
+    "kind": null,
+    "text": ""
+   }
+  },
+  {
+   "name": "4 missing block shows the link text",
+   "fn": "selectEmbeds",
+   "args": [
+    "See ![[A#^missing]] now."
+   ],
+   "expected": [
+    {
+     "from": 4,
+     "to": 19,
+     "linktext": "A#^missing",
+     "path": "A",
+     "blockId": "missing",
+     "alias": null,
+     "display": "A#^missing",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "4 missing block with an alias shows the alias",
+   "fn": "selectEmbeds",
+   "args": [
+    "See ![[A#^missing|see]] now."
+   ],
+   "expected": [
+    {
+     "from": 4,
+     "to": 23,
+     "linktext": "A#^missing",
+     "path": "A",
+     "blockId": "missing",
+     "alias": "see",
+     "display": "see",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "5 A and B embed each other inline: the loop stops",
+   "fn": "expandInline",
+   "args": [
+    {
+     "A": "Alpha cites ![[B#^b1]] here. ^a1",
+     "B": "Beta cites ![[A#^a1]] there. ^b1"
+    },
+    "A",
+    "a1"
+   ],
+   "expected": "Alpha cites Beta cites A#^a1 there. here."
+  },
+  {
+   "name": "5 a chain stops after depth 3",
+   "fn": "expandInline",
+   "args": [
+    {
+     "C": "c ![[D#^d]] c ^c",
+     "D": "d ![[E#^e]] d ^d",
+     "E": "e ![[F#^f]] e ^e",
+     "F": "f ![[G#^g]] f ^f",
+     "G": "g ^g"
+    },
+    "C",
+    "c"
+   ],
+   "expected": "c d e F#^f e d c"
+  },
+  {
+   "name": "5 a block that embeds itself stops",
+   "fn": "expandInline",
+   "args": [
+    {
+     "S": "Self ![[#^s1]] ref. ^s1"
+    },
+    "S",
+    "s1"
+   ],
+   "expected": "Self #^s1 ref."
+  },
+  {
+   "name": "5 a loop through a heading embed that Obsidian draws stops",
+   "fn": "expandInline",
+   "args": [
+    {
+     "X": "See ![[Y#Intro]] now. ^x",
+     "Y": "# Intro\n\nRecall ![[X#^x]] here.\n\n# Other\n\nNo."
+    },
+    "X",
+    "x"
+   ],
+   "expected": "See [Recall X#^x here.] now."
+  },
+  {
+   "name": "5 a loop through a note embed stops",
+   "fn": "expandInline",
+   "args": [
+    {
+     "A": "a ![[B]] a ^a",
+     "B": "b ![[A#^a]] b"
+    },
+    "A",
+    "a"
+   ],
+   "expected": "a [b A#^a b] a"
+  },
+  {
+   "name": "5 embeds that Obsidian draws count for depth 3",
+   "fn": "expandInline",
+   "args": [
+    {
+     "A": "a ![[B#H]] a ^a",
+     "B": "# H\n\nb ![[C#^c]] b",
+     "C": "c ![[D#^d]] c ^c",
+     "D": "d ^d"
+    },
+    "A",
+    "a"
+   ],
+   "expected": "a [b c D#^d c b] a"
+  },
+  {
+   "name": "6 table block is not inline",
+   "fn": "inlineText",
+   "args": [
+    "| a | b |\n| - | - |\n| 1 | 2 |\n\n^tb1\n",
+    "tb1"
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "table",
+    "text": ""
+   }
+  },
+  {
+   "name": "6 code block is not inline",
+   "fn": "inlineText",
+   "args": [
+    "```js\nlet x = 1;\n```\n^c1\n",
+    "c1"
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "code",
+    "text": ""
+   }
+  },
+  {
+   "name": "6 heading is not inline",
+   "fn": "inlineText",
+   "args": [
+    "## Plan ^h1\n\nText.",
+    "h1"
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "heading",
+    "text": ""
+   }
+  },
+  {
+   "name": "6 callout is not inline",
+   "fn": "inlineText",
+   "args": [
+    "> [!note] Title\n> Body ^q1\n",
+    "q1"
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "callout",
+    "text": ""
+   }
+  },
+  {
+   "name": "6 math block is not inline",
+   "fn": "inlineText",
+   "args": [
+    "$$\nx^2\n$$\n^m1\n",
+    "m1"
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "math",
+    "text": ""
+   }
+  },
+  {
+   "name": "multi line paragraph joins its lines",
+   "fn": "inlineText",
+   "args": [
+    "Intro.\n\nFirst line\nsecond line ^p2\n\nAfter.",
+    "p2"
+   ],
+   "expected": {
+    "state": "inline",
+    "kind": "paragraph",
+    "text": "First line second line"
+   }
+  },
+  {
+   "name": "numbered list item",
+   "fn": "inlineText",
+   "args": [
+    "1. Step one ^s1\n2. Step two",
+    "s1"
+   ],
+   "expected": {
+    "state": "inline",
+    "kind": "listItem",
+    "text": "Step one"
+   }
+  },
+  {
+   "name": "list item with a continuation line",
+   "fn": "inlineText",
+   "args": [
+    "- Item text\n  goes on ^li\n- Next",
+    "li"
+   ],
+   "expected": {
+    "state": "inline",
+    "kind": "listItem",
+    "text": "Item text goes on"
+   }
+  },
+  {
+   "name": "list item without Pro is not inline",
+   "fn": "inlineText",
+   "args": [
+    "- [ ] Call Bob ^t1",
+    "t1",
+    false
+   ],
+   "expected": {
+    "state": "native",
+    "kind": "listItem",
+    "text": ""
+   }
+  },
+  {
+   "name": "id inside a code block is not a block",
+   "fn": "inlineText",
+   "args": [
+    "```\nNot a block ^x1\n```\n",
+    "x1"
+   ],
+   "expected": {
+    "state": "missing",
+    "kind": null,
+    "text": ""
+   }
+  },
+  {
+   "name": "id in front matter is not a block",
+   "fn": "inlineText",
+   "args": [
+    "---\ntitle: a ^f1\n---\nBody",
+    "f1"
+   ],
+   "expected": {
+    "state": "missing",
+    "kind": null,
+    "text": ""
+   }
+  },
+  {
+   "name": "embed in inline code is ignored",
+   "fn": "selectEmbeds",
+   "args": [
+    "Use `![[A#^p1]]` to embed."
+   ],
+   "expected": []
+  },
+  {
+   "name": "escaped embed is ignored",
+   "fn": "selectEmbeds",
+   "args": [
+    "Write \\![[A#^p1]] as text."
+   ],
+   "expected": []
+  },
+  {
+   "name": "two embeds on one line are both selected",
+   "fn": "selectEmbeds",
+   "args": [
+    "![[A#^p1]] ![[B#^p2]]"
+   ],
+   "expected": [
+    {
+     "from": 0,
+     "to": 10,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": true
+    },
+    {
+     "from": 11,
+     "to": 21,
+     "linktext": "B#^p2",
+     "path": "B",
+     "blockId": "p2",
+     "alias": null,
+     "display": "B#^p2",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "list marker and task box are not other text",
+   "fn": "selectEmbeds",
+   "args": [
+    "- [ ] ![[A#^p1]]"
+   ],
+   "expected": [
+    {
+     "from": 6,
+     "to": 16,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": false
+    }
+   ]
+  },
+  {
+   "name": "quote marker is not other text",
+   "fn": "selectEmbeds",
+   "args": [
+    "> ![[A#^p1]]"
+   ],
+   "expected": [
+    {
+     "from": 2,
+     "to": 12,
+     "linktext": "A#^p1",
+     "path": "A",
+     "blockId": "p1",
+     "alias": null,
+     "display": "A#^p1",
+     "selected": false
+    }
+   ]
+  },
+  {
+   "name": "same note block embed",
+   "fn": "selectEmbeds",
+   "args": [
+    "See ![[#^p1|above]]."
+   ],
+   "expected": [
+    {
+     "from": 4,
+     "to": 19,
+     "linktext": "#^p1",
+     "path": "",
+     "blockId": "p1",
+     "alias": "above",
+     "display": "above",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "heading or note embeds are not block embeds",
+   "fn": "selectEmbeds",
+   "args": [
+    "See ![[A#Heading]] and ![[A]] here."
+   ],
+   "expected": []
+  },
+  {
+   "name": "path with folder and extension",
+   "fn": "selectEmbeds",
+   "args": [
+    "Per ![[notes/A.md#^p-1]], yes."
+   ],
+   "expected": [
+    {
+     "from": 4,
+     "to": 24,
+     "linktext": "notes/A.md#^p-1",
+     "path": "notes/A.md",
+     "blockId": "p-1",
+     "alias": null,
+     "display": "notes/A.md#^p-1",
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "embeds in comments are ignored",
+   "fn": "selectEmbeds",
+   "args": [
+    "See %% ![[A#^p1]] %% and <!-- ![[B#^p2]] --> x"
+   ],
+   "expected": []
+  }
+ ]
+}

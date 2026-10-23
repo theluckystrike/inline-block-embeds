@@ -1,0 +1,108 @@
+[
+	{
+		"feature": "without-plugin",
+		"caption": "Without the plugin, a block embed in a sentence is a framed box that breaks the line.",
+		"note": "Field notes.md",
+		"eval": "(async () => { document.querySelectorAll('.modal-container').forEach(el => el.remove()); const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); await app.plugins.disablePlugin('inline-block-embeds'); app.workspace.getMostRecentLeaf().rebuildView(); await new Promise(r => setTimeout(r, 1500)); return 'ok'; })()",
+		"after": "(async () => { await app.plugins.enablePlugin('inline-block-embeds'); await new Promise(r => setTimeout(r, 300)); app.workspace.getMostRecentLeaf().rebuildView(); await new Promise(r => setTimeout(r, 1200)); return 'ok'; })()",
+		"wait": 600
+	},
+	{
+		"feature": "live-preview",
+		"caption": "With the plugin, the block text flows in the sentence with a dotted underline.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<3;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<3) throw new Error('inline spans: '+n); return n; })()",
+		"wait": 900,
+		"zoom": 1.2
+	},
+	{
+		"feature": "inline-block-embeds",
+		"caption": "The same sentence before and after: the box becomes inline text, and the cursor in the embed shows the link.",
+		"frames": [
+			{
+				"note": "Field notes.md",
+				"eval": "(async () => { document.querySelectorAll('.modal-container').forEach(el => el.remove()); const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); await app.plugins.disablePlugin('inline-block-embeds'); app.workspace.getMostRecentLeaf().rebuildView(); await new Promise(r => setTimeout(r, 1500)); return 'off'; })()",
+				"wait": 500,
+				"hold": 2200,
+				"zoom": 1.2
+			},
+			{
+				"eval": "(async () => { await app.plugins.enablePlugin('inline-block-embeds'); await new Promise(r => setTimeout(r, 300)); app.workspace.getMostRecentLeaf().rebuildView(); await new Promise(r => setTimeout(r, 1200)); const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<3;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<3) throw new Error('inline spans: '+n); return 'on'; })()",
+				"wait": 500,
+				"hold": 2600,
+				"zoom": 1.2
+			},
+			{
+				"eval": "(async () => { const e=app.workspace.activeEditor.editor; e.focus(); e.setCursor({line:0,ch:25}); await new Promise(r => setTimeout(r, 500)); return e.getLine(0); })()",
+				"wait": 400,
+				"hold": 2000,
+				"zoom": 1.2
+			},
+			{
+				"eval": "(async () => { const e=app.workspace.activeEditor.editor; e.setCursor({line:0,ch:0}); await new Promise(r => setTimeout(r, 500)); return 'back'; })()",
+				"wait": 400,
+				"hold": 1800,
+				"zoom": 1.2
+			}
+		]
+	},
+	{
+		"feature": "reading-view",
+		"caption": "Reading view shows the same inline text, and PDF export keeps it.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'preview'}}); for (let i=0;i<40 && !document.querySelector('.workspace-leaf.mod-active .markdown-reading-view .ibe-inline');i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .markdown-reading-view .ibe-inline').length; if (n<3) throw new Error('reading spans '+n); return n; })()",
+		"after": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); return 'ok'; })()",
+		"wait": 800,
+		"zoom": 1.2
+	},
+	{
+		"feature": "missing",
+		"caption": "A block that does not exist shows its alias, or the link text, in the unresolved link style.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<3;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<3) throw new Error('inline spans: '+n); const m=document.querySelector('.workspace-leaf.mod-active .ibe-inline.is-unresolved'); if (!m || m.textContent!=='the old claim') throw new Error('no unresolved alias'); m.scrollIntoView({block:'center'}); return m.textContent; })()",
+		"wait": 700,
+		"zoom": 1.35
+	},
+	{
+		"feature": "loop",
+		"caption": "Two blocks that embed each other stop: the loop shows the link text.",
+		"note": "Loop.md",
+		"eval": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && !(document.querySelector('.workspace-leaf.mod-active .ibe-link-text'));i++) await new Promise(r=>setTimeout(r,100)); const t=document.querySelectorAll('.workspace-leaf.mod-active .cm-line')[0]?.textContent; if (t!=='Start: Note one cites Note two cites Loop source#^a there here end.') throw new Error('loop text '+t); return t; })()",
+		"wait": 700,
+		"zoom": 1.35
+	},
+	{
+		"feature": "list-items",
+		"caption": "Pro: a list item block is inline too, without its bullet and task box.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const p=app.plugins.plugins['inline-block-embeds']; p.pro.opts.http = async () => ({ status: 200, json: { data: { viewer: { login: 'demo-reader' }, user: { sponsorshipForViewerAsSponsor: { isActive: true, isOneTimePayment: false, tier: { name: '$5 a month', monthlyPriceInCents: 500 } } } } } }); app.secretStorage.setSecret('inline-block-embeds-github-token', 'gho_' + '0'.repeat(36)); await p.pro.refreshNow(); const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<4;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<4) throw new Error('inline spans: '+n); return n; })()",
+		"after": "(async () => { const p=app.plugins.plugins['inline-block-embeds']; p.settings.drawAll=false; p.settings.style='underline'; p.pro.signOut(); p.redrawAll(); return 'ok'; })()",
+		"wait": 900,
+		"zoom": 1.2
+	},
+	{
+		"feature": "styles",
+		"caption": "Pro: draw every block embed inline, here with the soft background style.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const p=app.plugins.plugins['inline-block-embeds']; p.pro.opts.http = async () => ({ status: 200, json: { data: { viewer: { login: 'demo-reader' }, user: { sponsorshipForViewerAsSponsor: { isActive: true, isOneTimePayment: false, tier: { name: '$5 a month', monthlyPriceInCents: 500 } } } } } }); app.secretStorage.setSecret('inline-block-embeds-github-token', 'gho_' + '0'.repeat(36)); await p.pro.refreshNow(); p.settings.drawAll=true; p.settings.style='background'; p.redrawAll(); const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<4;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<4) throw new Error('inline spans: '+n); for (let i=0;i<40 && !document.querySelector('.workspace-leaf.mod-active .cm-content > .ibe-line');i++) await new Promise(r=>setTimeout(r,100)); if (!document.querySelector('.workspace-leaf.mod-active .cm-content > .ibe-line')) throw new Error('no line embed'); return 'ok'; })()",
+		"after": "(async () => { const p=app.plugins.plugins['inline-block-embeds']; p.settings.drawAll=false; p.settings.style='underline'; p.pro.signOut(); p.redrawAll(); return 'ok'; })()",
+		"wait": 900,
+		"zoom": 1.2
+	},
+	{
+		"feature": "settings",
+		"caption": "The settings: draw every block embed inline and the inline style (Pro).",
+		"eval": "(async () => { app.setting.open(); app.setting.openTabById('inline-block-embeds'); await new Promise(r => setTimeout(r, 800)); return 'ok'; })()",
+		"after": "(async () => { app.setting.close(); return 'ok'; })()",
+		"wait": 700
+	},
+	{
+		"feature": "hover",
+		"caption": "Rest the pointer on the inline text to see the source block in the page preview.",
+		"note": "Field notes.md",
+		"eval": "(async () => { const l=app.workspace.getLeaf(false); const s=l.getViewState(); await l.setViewState({...s,state:{...s.state,mode:'source',source:false}}); l.view.editor.setCursor({line:0,ch:0}); for (let i=0;i<40 && document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length<3;i++) await new Promise(r=>setTimeout(r,100)); const n=document.querySelectorAll('.workspace-leaf.mod-active .cm-line .ibe-inline').length; if (n<3) throw new Error('inline spans: '+n); const el=document.querySelector('.workspace-leaf.mod-active .cm-line .ibe-inline'); const r=el.getBoundingClientRect(); el.dispatchEvent(new MouseEvent('mouseover',{bubbles:true,clientX:r.left+20,clientY:r.top+6})); for (let i=0;i<30 && !document.querySelector('.hover-popover');i++) await new Promise(r=>setTimeout(r,100)); if (!document.querySelector('.hover-popover')) throw new Error('no page preview'); return 'ok'; })()",
+		"after": "(async () => { const el=document.querySelector('.workspace-leaf.mod-active .cm-line .ibe-inline'); for (const t of [el, ...document.querySelectorAll('.hover-popover')]) { if (!t) continue; t.dispatchEvent(new MouseEvent('mouseout',{bubbles:true,relatedTarget:document.body})); t.dispatchEvent(new MouseEvent('mouseleave',{bubbles:false,relatedTarget:document.body})); } for (let i=0;i<30 && document.querySelector('.hover-popover');i++) await new Promise(r=>setTimeout(r,100)); document.querySelectorAll('.hover-popover').forEach(p => p.remove()); return 'ok'; })()",
+		"wait": 900,
+		"zoom": 1.2
+	}
+]

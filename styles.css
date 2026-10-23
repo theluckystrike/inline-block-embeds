@@ -1,0 +1,63 @@
+/* Styles for Inline Block Embeds. Obsidian loads this file while the plugin is enabled. */
+
+/* Rule 10: the block text flows in the line. No frame and no icon, only a quiet underline. */
+.ibe-inline {
+	display: inline;
+	cursor: text;
+	border-bottom: 1px dotted var(--text-faint);
+}
+
+.ibe-inline p,
+.ibe-inline div {
+	display: inline;
+}
+
+.ibe-inline.ibe-style-background {
+	padding: 0 2px;
+	border-radius: var(--radius-s);
+	border-bottom: none;
+	background-color: var(--background-modifier-hover);
+}
+
+.ibe-inline.ibe-style-none {
+	border-bottom: none;
+}
+
+/* An embed alone on its line, drawn inline with "Draw every block embed inline", fills its line as text. */
+.ibe-inline.ibe-line {
+	display: block;
+	width: fit-content;
+}
+
+/* Rule 17: a block that does not exist looks like an unresolved link. */
+.ibe-inline.is-unresolved {
+	color: var(--link-unresolved-color);
+	opacity: var(--link-unresolved-opacity);
+	border-bottom: 1px dashed var(--link-unresolved-decoration-color);
+}
+
+/* Rule 18: a loop or a level past the limit shows the link text. */
+.ibe-link-text {
+	color: var(--text-muted);
+}
+
+/* NoteMods What's new tab and settings card */
+.notemods-hello {
+	overflow-y: auto;
+}
+
+.notemods-hello-page {
+	max-width: var(--file-line-width);
+	margin: 0 auto;
+	padding: var(--size-4-6) var(--size-4-4);
+}
+
+.notemods-hello-sub,
+.notemods-hello-blurb {
+	color: var(--text-muted);
+}
+
+.notemods-hello-buttons .setting-item-control {
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
