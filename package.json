@@ -1,5 +1,6 @@
 {
 	"name": "inline-block-embeds",
+	"repository": {"type": "git", "url": "theluckystrike/inline-block-embeds.git"},
 	"version": "1.0.0",
 	"private": true,
 	"description": "Shows a block embed that sits inside a sentence as inline text in the line, with a hover preview and a jump to the source block.",
