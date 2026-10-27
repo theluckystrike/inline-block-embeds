@@ -1,8 +1,10 @@
 {
 	"id": "inline-block-embeds",
 	"name": "Inline Block Embeds",
-	"version": "1.0.0",
-	"changes": [],
+	"version": "1.0.1",
+	"changes": [
+		"Draw every block embed inline and Inline style now show how to get Pro, with a Sponsor on GitHub button, when you select them. The row goes back to the free value and nothing is saved."
+	],
 	"tip": "Hold Ctrl or Cmd and click the inline text to open the source block. A plain click shows the embed link so you can edit it.",
 	"thanks": "Hi, I am Michael, a solo developer in Poland. Inline Block Embeds is one of over 100 small plugins that I make. Thank you for trusting it with your notes.",
 	"related": [
