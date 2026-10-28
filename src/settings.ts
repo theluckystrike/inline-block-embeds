@@ -1,5 +1,5 @@
-import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
-import { sponsorsSettingItems } from './license/github-obsidian';
+import { PluginSettingTab, type Notice, type SettingDefinitionItem } from 'obsidian';
+import { sponsorsSettingItems, redrawKeepFocus } from './license/github-obsidian';
 import { PRO_UI, isPro, proNotice } from './pro';
 import type { EmbedStyle, Options } from './render';
 import type InlineBlockEmbedsPlugin from './main';
@@ -48,6 +48,9 @@ export const PRO_LEADS: Partial<Record<keyof InlineBlockEmbedsSettings, string>>
 };
 
 export class InlineBlockEmbedsSettingTab extends PluginSettingTab {
+	/** The last Pro notice of this tab and its lead. The same notice does not show again while it is open. */
+	private notice: Notice | null = null;
+	private noticeLead = '';
 	plugin: InlineBlockEmbedsPlugin;
 
 	constructor(app: ConstructorParameters<typeof PluginSettingTab>[0], plugin: InlineBlockEmbedsPlugin) {
@@ -93,12 +96,15 @@ export class InlineBlockEmbedsSettingTab extends PluginSettingTab {
 		const lead = PRO_LEADS[key as keyof InlineBlockEmbedsSettings];
 		if (lead && !isPro()) {
 			// Free users can select the Pro settings: the notice shows what Pro adds and how to get it. Nothing is saved.
-			proNotice(lead);
+			// One notice at a time for the same Pro setting: a repeated key on the focused control adds no new notice.
+			const noticeLead = lead;
+			if (!this.notice?.messageEl.isConnected || this.noticeLead !== noticeLead) {
+				this.notice = proNotice(noticeLead);
+				this.noticeLead = noticeLead;
+			}
 			// Obsidian does not draw a control again while it has the focus. Move the focus out, then draw the tab
 			// again, so the row shows the value in effect.
-			const active = this.containerEl.ownerDocument.activeElement as HTMLElement | null;
-			if (active && this.containerEl.contains(active)) active.blur();
-			this.update();
+			redrawKeepFocus(this);
 			return;
 		}
 		await super.setControlValue(key, value);
