@@ -1,5 +1,11 @@
 # inline-block-embeds
 
+## 1.0.3
+
+### Patch Changes
+
+- 371e979: The Pro notice of Inline Block Embeds now says that one payment turns on Pro in every NoteMods plugin.
+
 ## 1.0.2
 
 ### Patch Changes

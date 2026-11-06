@@ -6,7 +6,7 @@ const DRAW_ALL = 'Draw every block embed inline';
 const STYLE = 'Inline style';
 const LEAD_DRAW_ALL = 'Drawing every block embed inline is a Pro feature.';
 const LEAD_STYLE = 'The soft background and none styles are Pro features.';
-const PITCH = 'Sponsor on GitHub, then sign in from the plugin settings.';
+const PITCH = 'One payment turns on Pro in every NoteMods plugin. Sponsor on GitHub, then sign in from the plugin settings.';
 
 interface Notice { text: string; buttons: number }
 interface Row { disabled: boolean; checked: boolean | null; value: string | null }

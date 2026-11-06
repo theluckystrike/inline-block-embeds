@@ -1,9 +1,9 @@
 {
 	"id": "inline-block-embeds",
 	"name": "Inline Block Embeds",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"changes": [
-		"When the settings refuse a Pro choice, for example in Inline style, the keyboard focus now stays on that setting."
+		"The Pro notice of Inline Block Embeds now says that one payment turns on Pro in every NoteMods plugin."
 	],
 	"tip": "Hold Ctrl or Cmd and click the inline text to open the source block. A plain click shows the embed link so you can edit it.",
 	"thanks": "Hi, I am Michael, a solo developer in Poland. Inline Block Embeds is one of over 100 small plugins that I make. Thank you for trusting it with your notes.",
